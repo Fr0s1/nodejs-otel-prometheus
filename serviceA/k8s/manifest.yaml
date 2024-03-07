@@ -1,0 +1,46 @@
+# serviceA-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-prometheus-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: express-prometheus
+  template:
+    metadata:
+      labels:
+        app: express-prometheus
+    spec:
+      containers:
+        - name: express-prometheus-container
+          image: frost2203/express-prometheus:v3 # Update with your actual image details
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "100Mi"
+            limits:
+              cpu: "50m"
+              memory: "200Mi"
+---
+# serviceA-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: express-prometheus-service
+  annotations:
+    prometheus_scrape: "true"
+    prometheus_metrics_path: "/metrics"
+    prometheus_scheme: "http"
+    prometheus_port: "80"
+spec:
+  selector:
+    app: express-prometheus
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP

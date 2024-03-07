@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  service-a:
+    build: ./serviceA
+    ports:
+      - "3000:3000"
+    environment:
+      - SERVICE_B_URL=http://service-b:4000
+      - OTEL_SERVICE_NAME=serviceA
+    image: frost2203/express-prometheus:v3
+
+  service-b:
+    build: ./serviceB
+    ports:
+      - "4000:4000"
+    environment:
+      - OTEL_SERVICE_NAME=serviceB
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
